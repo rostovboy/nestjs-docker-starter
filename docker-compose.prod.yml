@@ -13,9 +13,16 @@ services:
       - .:/app
     ports:
       - ${PORT}:${PORT}
-    command: bash -c "npm install && npm run start:dev"
+    command: bash -c "npm install && npm run build && npm run start:prod"
+    # settings to deploy with jwilder/nginx-proxy
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: ${PORT}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     networks:
       - appnetwork
+      - default # settings to deploy with jwilder/nginx-proxy
     depends_on:
       - db
     working_dir: /app
@@ -63,6 +70,10 @@ networks:
   appnetwork:
     name: ${APP_NAME}
     driver: bridge
+  # settings to deploy with jwilder/nginx-proxy
+  default:
+    external:
+      name: nginx-proxy
 
 volumes:
   mysql-data:
